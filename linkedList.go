@@ -122,12 +122,20 @@ func (list *LinkedList) Delete(index int) *Node {
 }
 
 func (list *LinkedList) Display() {
+	counter := 0
+	printed := false
+	if cursorIndex == -1 {
+		fmt.Printf("|")
+		printed = true
+	}
 	rooter := list.Head
-	fmt.Print("list is :   ")
 	for rooter != nil {
 		fmt.Print(rooter.Key)
-		fmt.Print("  ")
+		if counter == cursorIndex && !printed {
+			fmt.Printf("|")
+		}
 		rooter = rooter.Next
+		counter += 1
 	}
 	fmt.Println()
 }

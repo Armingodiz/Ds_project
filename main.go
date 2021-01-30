@@ -5,10 +5,10 @@ import (
 )
 
 var cursorIndex int
+var requests int
 
 func main() {
 	cursorIndex = -1
-	var requests int
 	fmt.Scan(&requests)
 	var input string
 	fmt.Scan(&input)
@@ -17,6 +17,10 @@ func main() {
 		list.AddFront(string(input[i]))
 	}
 	list.Display()
+	start(list)
+}
+
+func start(list *LinkedList) {
 	var inp1 string
 	var inp2 string
 	for i := 0; i < requests; i++ {
@@ -38,8 +42,12 @@ func main() {
 		case "-":
 			break
 		case "?":
+			list.Display()
 			break
 		case "!":
+			break
+		case "@":
+			fmt.Println(cursorIndex)
 			break
 
 		}
