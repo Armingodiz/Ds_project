@@ -38,6 +38,7 @@ func start(list *LinkedList) {
 			break
 		case "+":
 			fmt.Scan(&inp2)
+			list.AddAfterIndex(cursorIndex, inp2)
 			break
 		case "-":
 			break
@@ -46,10 +47,6 @@ func start(list *LinkedList) {
 			break
 		case "!":
 			break
-		case "@":
-			fmt.Println(cursorIndex)
-			break
-
 		}
 	}
 }
