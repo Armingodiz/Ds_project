@@ -48,12 +48,12 @@ func (list *LinkedList) AddFront(key string) {
 	list.Size = list.Size + 1
 }
 
-func (list *LinkedList) AddAfterIndex(index int, key string) {
-	if index == -1 {
+func (list *LinkedList) AddAfterIndex(key string) {
+	if cursorIndex == -1 {
 		list.AddBack(key)
 
 	} else {
-		start := list.Search(index)
+		start := list.Search(cursorIndex)
 		node := &Node{
 			Key:  key,
 			Prev: nil,
@@ -62,6 +62,25 @@ func (list *LinkedList) AddAfterIndex(index int, key string) {
 		node.Next = start.Next
 		start.Next = node
 		node.Prev = start
+	}
+}
+
+func (list *LinkedList) DeleteBeforIndex() {
+	if cursorIndex != -1 {
+		node := list.Search(cursorIndex)
+		if node.Next == nil && node.Prev == nil { // node is the only node
+			list.Head = nil
+		} else if node.Next == nil { //node is tail of list
+			list.Tail = node.Prev
+			node.Prev.Next = nil
+		} else if node.Prev == nil { //nod is head of list
+			list.Head = node.Next
+			node.Next.Prev = nil
+		} else {
+			node.Next.Prev = node.Prev
+			node.Prev.Next = node.Next
+		}
+		list.Size = list.Size - 1
 	}
 }
 

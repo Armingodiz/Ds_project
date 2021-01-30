@@ -38,9 +38,12 @@ func start(list *LinkedList) {
 			break
 		case "+":
 			fmt.Scan(&inp2)
-			list.AddAfterIndex(cursorIndex, inp2)
+			list.AddAfterIndex(inp2)
+			cursorIndex += 1
 			break
 		case "-":
+			list.DeleteBeforIndex()
+			cursorIndex -= 1
 			break
 		case "?":
 			list.Display()
