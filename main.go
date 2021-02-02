@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -66,8 +67,35 @@ func GetPre(c string) int {
 	}
 }
 
-func InfToPost(list *LinkedList) {
-
+func InfToPost(list *LinkedList) *LinkedList {
+	stack := CreateStack()
+	result := CreateLinkedList()
+	current := list.Head
+	for ; current != nil; {
+		_, err := strconv.Atoi(current.Key)
+		if err == nil {
+			result.AddFront(current.Key)
+		} else if strings.EqualFold(current.Key,"(") {
+			stack.Push(current.Key)
+		} else if strings.EqualFold(current.Key,")") {
+			for ;!stack.IsEmpty() && strings.EqualFold(stack.Peak(),"("); {
+				result.AddFront(stack.Pop())
+			}
+			if strings.EqualFold(stack.Peak(),"(") {
+				stack.Pop()
+			}
+		} else{
+			for;!stack.IsEmpty() && GetPre(current.Key) <= GetPre(stack.Peak());{
+				result.AddFront(stack.Pop())
+			}
+			stack.Push(current.Key)
+		}
+		current = current.Next
+	}
+	for ;!stack.IsEmpty();{
+		result.AddFront(stack.Pop())
+	}
+	return result
 }
 
 /// stack implementation :
