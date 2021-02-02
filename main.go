@@ -57,13 +57,13 @@ func start(list *LinkedList) {
 /// stack implementation :
 
 type Stack struct {
-	stack []int
+	stack []string
 	top   int
 }
 
 func CreateStack() *Stack {
 	stack := &Stack{
-		stack: []int{},
+		stack: []string{},
 		top:   -1,
 	}
 	return stack
@@ -77,14 +77,14 @@ func (stack *Stack) IsEmpty() bool {
 	return false
 }
 
-func (stack *Stack) Push(element int) {
+func (stack *Stack) Push(element string) {
 	stack.stack = append(stack.stack, element)
 	stack.top += 1
 }
 
-func (stack *Stack) Pop() interface{} {
+func (stack *Stack) Pop() string {
 	if stack.IsEmpty() {
-		return nil
+		return ""
 	} else {
 		popped := stack.stack[stack.top]
 		stack.top -= 1
@@ -93,9 +93,9 @@ func (stack *Stack) Pop() interface{} {
 	}
 }
 
-func (stack *Stack) Peak() interface{} {
+func (stack *Stack) Peak() string {
 	if stack.IsEmpty() {
-		return nil
+		return ""
 	} else {
 		return stack.stack[stack.top]
 	}
