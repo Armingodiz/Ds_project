@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 var cursorIndex int
@@ -53,6 +54,21 @@ func start(list *LinkedList) {
 		}
 	}
 }
+func GetPre(c string) int {
+	if strings.EqualFold("^", c) {
+		return 3
+	} else if strings.EqualFold(c, "*") || strings.EqualFold(c, "/") {
+		return 2
+	} else if strings.EqualFold(c, "+") || strings.EqualFold(c, "-") {
+		return 1
+	} else {
+		return -1
+	}
+}
+
+func InfToPost(list *LinkedList) {
+
+}
 
 /// stack implementation :
 
@@ -100,7 +116,6 @@ func (stack *Stack) Peak() string {
 		return stack.stack[stack.top]
 	}
 }
-
 
 /// linked list implementation :
 
