@@ -51,12 +51,20 @@ func start(list *LinkedList) {
 			list.Display()
 			break
 		case "!":
+			newList := InfToPost(list)
+			newList.Display()
 			break
 		}
 	}
 }
+
+// a+b*(c^d-e)^(f+g*h)-i
+// 172+2*(3^4-5)^(6+7*8)-9
+// 1234^5-678*+^*+9-
+// 1234^5-678*+^*+9-
+
 func GetPre(c string) int {
-	if strings.EqualFold("^", c) {
+	if strings.Compare(c, "^") == 0 {
 		return 3
 	} else if strings.EqualFold(c, "*") || strings.EqualFold(c, "/") {
 		return 2
@@ -73,26 +81,37 @@ func InfToPost(list *LinkedList) *LinkedList {
 	current := list.Head
 	for ; current != nil; {
 		_, err := strconv.Atoi(current.Key)
+		num := current.Key
 		if err == nil {
-			result.AddFront(current.Key)
-		} else if strings.EqualFold(current.Key,"(") {
+			for err == nil && current.Next != nil {
+				_, err = strconv.Atoi(current.Next.Key)
+				if err == nil {
+					num += current.Next.Key
+					current = current.Next
+					if current == nil {
+						break
+					}
+				}
+			}
+			result.AddFront(num)
+		} else if strings.Compare(current.Key, "(") == 0 {
 			stack.Push(current.Key)
-		} else if strings.EqualFold(current.Key,")") {
-			for ;!stack.IsEmpty() && strings.EqualFold(stack.Peak(),"("); {
+		} else if strings.Compare(current.Key, ")") == 0 {
+			for ; !stack.IsEmpty() && strings.Compare(stack.Peak(), "(") != 0; {
 				result.AddFront(stack.Pop())
 			}
-			if strings.EqualFold(stack.Peak(),"(") {
+			if strings.Compare(stack.Peak(), "(") == 0 {
 				stack.Pop()
 			}
-		} else{
-			for;!stack.IsEmpty() && GetPre(current.Key) <= GetPre(stack.Peak());{
+		} else {
+			for ; !stack.IsEmpty() && GetPre(current.Key) <= GetPre(stack.Peak()); {
 				result.AddFront(stack.Pop())
 			}
 			stack.Push(current.Key)
 		}
 		current = current.Next
 	}
-	for ;!stack.IsEmpty();{
+	for ; !stack.IsEmpty(); {
 		result.AddFront(stack.Pop())
 	}
 	return result
@@ -115,7 +134,6 @@ func CreateStack() *Stack {
 
 func (stack *Stack) IsEmpty() bool {
 	if stack.top == -1 {
-		fmt.Println("STACK IS EMPTY !")
 		return true
 	}
 	return false
@@ -292,7 +310,9 @@ func (list *LinkedList) Display() {
 	}
 	rooter := list.Head
 	for rooter != nil {
+		fmt.Print("@")
 		fmt.Print(rooter.Key)
+		fmt.Print("@")
 		if counter == cursorIndex && !printed {
 			fmt.Printf("|")
 		}
