@@ -26,33 +26,38 @@ func start(list *LinkedList) {
 	var inp1 string
 	var inp2 string
 	for i := 0; i < requests; i++ {
+		//list.Display()
 		fmt.Scan(&inp1)
 		switch inp1 {
 		case "<":
-			if cursorIndex != list.Size-1 {
-				cursorIndex += 1
+			if cursorIndex != -1 {
+				cursorIndex -= 1
 			}
 			break
 		case ">":
-			if cursorIndex != -1 {
-				cursorIndex -= 1
+			if cursorIndex != list.Size {
+				cursorIndex += 1
 			}
 			break
 		case "+":
 			fmt.Scan(&inp2)
 			list.AddAfterIndex(inp2)
-			cursorIndex += 1
+			if cursorIndex < list.Size {
+				cursorIndex += 1
+			}
 			break
 		case "-":
 			list.DeleteBeforIndex()
-			cursorIndex -= 1
+			if cursorIndex > -1 {
+				cursorIndex -= 1
+			}
 			break
 		case "?":
 			list.Display()
 			break
 		case "!":
 			newList := InfToPost(list)
-			newList.Display()
+			//newList.Display()
 			res, _ := calculatePost(newList)
 			fmt.Println(res)
 			break
@@ -263,6 +268,7 @@ func (list *LinkedList) AddAfterIndex(key string) {
 		start.Next = node
 		node.Prev = start
 	}
+	list.Size = list.Size + 1
 }
 
 func (list *LinkedList) DeleteBeforIndex() {
