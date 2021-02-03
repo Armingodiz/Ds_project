@@ -53,16 +53,18 @@ func start(list *LinkedList) {
 		case "!":
 			newList := InfToPost(list)
 			newList.Display()
+			res, _ := calculatePost(newList)
+			fmt.Println(res)
 			break
 		}
 	}
 }
 
 // a+b*(c^d-e)^(f+g*h)-i
-// 172+2*(3^4-5)^(6+7*8)-9
+// 1+2*(3^4-5)^(6+7*8)-9
 // 1234^5-678*+^*+9-
 // 1234^5-678*+^*+9-
-
+// 14+2+3*5-9
 func GetPre(c string) int {
 	if strings.Compare(c, "^") == 0 {
 		return 3
@@ -115,6 +117,42 @@ func InfToPost(list *LinkedList) *LinkedList {
 		result.AddFront(stack.Pop())
 	}
 	return result
+}
+
+func calculatePost(list *LinkedList) (int, error) {
+	stack := CreateStack()
+	// Scan all characters one by one
+	current := list.Head
+	for current != nil {
+		// If the scanned character is an operand (number here),
+		// push it to the stack.
+		_, err := strconv.Atoi(current.Key)
+		if err == nil {
+			stack.Push(current.Key)
+		} else { // If the scanned character is an operator, pop two
+			// elements from stack apply the operator   else
+			val1, err1 := strconv.Atoi(stack.Pop())
+			val2, err2 := strconv.Atoi(stack.Pop())
+			if err1 == nil && err2 == nil {
+				switch current.Key {
+				case "+":
+					stack.Push(strconv.Itoa(val2 + val1))
+					break
+				case "-":
+					stack.Push(strconv.Itoa(val2 - val1))
+					break
+				case "*":
+					stack.Push(strconv.Itoa(val2 * val1))
+					break
+				case "/":
+					stack.Push(strconv.Itoa(val2 / val1))
+					break
+				}
+			}
+		}
+		current = current.Next
+	}
+	return strconv.Atoi(stack.Pop())
 }
 
 /// stack implementation :
@@ -177,7 +215,8 @@ type LinkedList struct {
 	Tail *Node
 }
 
-func CreateLinkedList() *LinkedList {
+func
+CreateLinkedList() *LinkedList {
 	list := LinkedList{
 		Size: 0,
 		Head: nil,
@@ -310,9 +349,9 @@ func (list *LinkedList) Display() {
 	}
 	rooter := list.Head
 	for rooter != nil {
-		fmt.Print("@")
+		//fmt.Print("@")
 		fmt.Print(rooter.Key)
-		fmt.Print("@")
+		//fmt.Print("@")
 		if counter == cursorIndex && !printed {
 			fmt.Printf("|")
 		}
