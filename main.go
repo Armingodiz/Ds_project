@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -8,10 +9,11 @@ import (
 
 var cursorIndex int
 var requests int
+var table *HashTable
 
 func main() {
-	fmt.Println(hash("geeksforgeeks"))
 	cursorIndex = -1
+	table = NewHashTable(10)
 	fmt.Scan(&requests)
 	var input string
 	fmt.Scan(&input)
@@ -57,24 +59,30 @@ func start(list *LinkedList) {
 			list.Display()
 			break
 		case "!":
-			newList := InfToPost(list)
-			//newList.Display()
-			res, _ := calculatePost(newList)
-			fmt.Println(res)
+			listString := list.getString()
+			tableResult := table.Search(listString)
+			if tableResult != nil {
+				fmt.Println(tableResult.Value)
+			} else {
+				newList := InfToPost(list)
+				res, _ := calculatePost(newList)
+				table.Insert(listString, res)
+				fmt.Println(res)
+			}
 			break
 		}
 	}
 }
-func  hash(key string)  int {
-	p := 31;
-	m := 1000000009;
-	power_of_p := 1;
-	hash_val := 0;
-	for  i := 0; i < len(key); i++ {
-		hash_val = (hash_val+ (int(key[i]) - 'a' + 1) * power_of_p) % m;
-		power_of_p = (power_of_p * p) % m;
+func hash(key string) int {
+	p := 31
+	m := 1000000009
+	power_of_p := 1
+	hash_val := 0
+	for i := 0; i < len(key); i++ {
+		hash_val = (hash_val + (int(key[i])-'a'+1)*power_of_p) % m
+		power_of_p = (power_of_p * p) % m
 	}
-	return hash_val;
+	return hash_val
 }
 
 // a+b*(c^d-e)^(f+g*h)-i
@@ -242,6 +250,15 @@ CreateLinkedList() *LinkedList {
 	return &list
 }
 
+func (list *LinkedList) getString() string {
+	result := ""
+	temp := list.Head
+	for temp != nil {
+		result += temp.Key
+	}
+	return result
+}
+
 func (list *LinkedList) AddFront(key string) {
 	if list.Size == 0 {
 		list.firstInitialize(key)
@@ -389,5 +406,106 @@ func (list *LinkedList) Search(index int) *Node {
 			node = node.Next
 		}
 		return node
+	}
+}
+
+// hash table implementation :
+
+type HashNode struct {
+	Key   string
+	Value int
+}
+
+type HashTable struct {
+	Size     int
+	Capacity int
+	Array    []*HashNode
+	Dummy    *HashNode
+}
+
+func NewHashTable(capacity int) *HashTable {
+	return &HashTable{
+		Size:     0,
+		Capacity: capacity,
+		Array:    make([]*HashNode, capacity),
+		Dummy: &HashNode{
+			Key:   "",
+			Value: -1,
+		},
+	}
+}
+
+func NewHashNode(key string, value int) *HashNode {
+	return &HashNode{
+		Key:   key,
+		Value: value,
+	}
+}
+func hashCode(key string) int {
+	p := 31
+	m := 1000000009
+	power_of_p := 1
+	hash_val := 0
+	for i := 0; i < len(key); i++ {
+		hash_val = (hash_val + (int(key[i])-'a'+1)*power_of_p) % m
+		power_of_p = (power_of_p * p) % m
+	}
+	return hash_val
+}
+
+func (table *HashTable) hashCodePrime(hashIndex int) int {
+	hashIndex += 1
+	hashIndex %= table.Capacity
+	return hashIndex
+}
+
+func (table *HashTable) Insert(key string, value int) error {
+	if table.Size == table.Capacity {
+		return errors.New("hash table is full !")
+	}
+	node := NewHashNode(key, value)
+	hashIndex := hashCode(key)
+	for table.Array[hashIndex] != nil && table.Array[hashIndex] != table.Dummy {
+		hashIndex = table.hashCodePrime(hashIndex)
+	}
+	if table.Array[hashIndex] == nil || table.Array[hashIndex] == table.Dummy {
+		table.Array[hashIndex] = node
+		table.Size = table.Size + 1
+		return nil
+	} else {
+		return errors.New("error in finding empty slot !!")
+	}
+}
+
+func (table *HashTable) Search(key string) *HashNode {
+	hashIndex := hashCode(key)
+	for table.Array[hashIndex] != nil {
+		if table.Array[hashIndex].Key == key {
+			return table.Array[hashIndex]
+		}
+		hashIndex = table.hashCodePrime(hashIndex)
+	}
+	return nil
+}
+
+func (table *HashTable) Delete(key string) error {
+	hashIndex := hashCode(key)
+	for table.Array[hashIndex] != nil {
+		if table.Array[hashIndex].Key == key {
+			table.Array[hashIndex] = table.Dummy
+			return nil
+		}
+		hashIndex = table.hashCodePrime(hashIndex)
+	}
+	return errors.New("key not found ! ")
+}
+
+func (table *HashTable) Display() {
+	for i := 0; i < table.Capacity; i++ {
+		fmt.Print("for slot ")
+		fmt.Print(i)
+		fmt.Print(" : ")
+		fmt.Println(table.Array[i])
+		fmt.Println("###########################################")
 	}
 }
