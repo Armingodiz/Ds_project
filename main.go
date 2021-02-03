@@ -10,6 +10,7 @@ var cursorIndex int
 var requests int
 
 func main() {
+	fmt.Println(hash("geeksforgeeks"))
 	cursorIndex = -1
 	fmt.Scan(&requests)
 	var input string
@@ -18,7 +19,7 @@ func main() {
 	for i := 0; i < len(input); i++ {
 		list.AddFront(string(input[i]))
 	}
-	list.Display()
+	//list.Display()
 	start(list)
 }
 
@@ -63,6 +64,17 @@ func start(list *LinkedList) {
 			break
 		}
 	}
+}
+func  hash(key string)  int {
+	p := 31;
+	m := 1000000009;
+	power_of_p := 1;
+	hash_val := 0;
+	for  i := 0; i < len(key); i++ {
+		hash_val = (hash_val+ (int(key[i]) - 'a' + 1) * power_of_p) % m;
+		power_of_p = (power_of_p * p) % m;
+	}
+	return hash_val;
 }
 
 // a+b*(c^d-e)^(f+g*h)-i
