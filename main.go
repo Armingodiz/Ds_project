@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -10,8 +12,10 @@ import (
 var cursor *Node // pointer to the node which is before cursor
 var requests int
 var table *HashTable
+var reader *bufio.Reader
 
 func main() {
+	reader = bufio.NewReader(os.Stdin)
 	cursor = nil
 	table = NewHashTable(10)
 	fmt.Scan(&requests)
@@ -24,13 +28,22 @@ func main() {
 	//list.Display()
 	start(list)
 }
+func Scan(inp1, inp2 *string) {
+	line, _ := reader.ReadString('\n')
+	line = strings.TrimSuffix(line, "\n")
+	numbers := strings.Split(line, " ")
+	*inp1 = numbers[0]
+	if len(numbers) == 2 {
+		*inp2 = numbers[1]
+	}
+}
 
 func start(list *LinkedList) {
 	var inp1 string
 	var inp2 string
 	for i := 0; i < requests; i++ {
 		//list.Display()
-		fmt.Scan(&inp1)
+		Scan(&inp1, &inp2)
 		switch inp1 {
 		case "<":
 			if cursor != nil {
@@ -45,7 +58,6 @@ func start(list *LinkedList) {
 			}
 			break
 		case "+":
-			fmt.Scan(&inp2)
 			list.AddAfterIndex(inp2)
 			break
 		case "-":
@@ -163,7 +175,9 @@ func calculatePost(list *LinkedList) (int, error) {
 	}
 	return strconv.Atoi(stack.Pop())
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////////////////////// customized stack implementation :
 
 type Stack struct {
@@ -209,6 +223,7 @@ func (stack *Stack) Peak() string {
 		return stack.stack[stack.top]
 	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////// customized  linked list implementation :
 
@@ -224,8 +239,7 @@ type LinkedList struct {
 	Tail *Node
 }
 
-func
-CreateLinkedList() *LinkedList {
+func CreateLinkedList() *LinkedList {
 	list := LinkedList{
 		Size: 0,
 		Head: nil,
@@ -307,30 +321,6 @@ func (list *LinkedList) DeleteBeforeIndex() {
 	list.Size = list.Size - 1
 }
 
-func (list *LinkedList) AddBack(key string) {
-	if list.Size == 0 {
-		list.firstInitialize(key)
-	} else if list.Size == 1 {
-		node := &Node{
-			Key:  key,
-			Prev: nil,
-			Next: list.Head,
-		}
-		list.Head.Prev = node
-		list.Tail = list.Head
-		list.Head = node
-	} else {
-		node := &Node{
-			Key:  key,
-			Prev: nil,
-			Next: list.Head,
-		}
-		list.Head.Prev = node
-		list.Head = node
-	}
-	list.Size = list.Size + 1
-}
-
 // adding first element to linked list
 func (list *LinkedList) firstInitialize(key string) {
 	node := &Node{
@@ -339,28 +329,6 @@ func (list *LinkedList) firstInitialize(key string) {
 		Next: nil,
 	}
 	list.Head = node
-}
-
-func (list *LinkedList) Delete(index int) *Node {
-	node := list.Search(index)
-	if node == nil {
-		return nil
-	} else {
-		if node.Next == nil && node.Prev == nil { // node is the only node
-			list.Head = nil
-		} else if node.Next == nil { //node is tail of list
-			list.Tail = node.Prev
-			node.Prev.Next = nil
-		} else if node.Prev == nil { //nod is head of list
-			list.Head = node.Next
-			node.Next.Prev = nil
-		} else {
-			node.Next.Prev = node.Prev
-			node.Prev.Next = node.Next
-		}
-		list.Size = list.Size - 1
-		return node
-	}
 }
 
 func (list *LinkedList) Display() {
@@ -379,19 +347,6 @@ func (list *LinkedList) Display() {
 		rooter = rooter.Next
 	}
 	fmt.Println()
-}
-
-func (list *LinkedList) Search(index int) *Node {
-	if index < 0 || index > list.Size {
-		fmt.Println("INVALID INDEX !")
-		return nil
-	} else {
-		node := list.Head
-		for i := 0; i < index; i++ {
-			node = node.Next
-		}
-		return node
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////////// customized  hash table implementation :
