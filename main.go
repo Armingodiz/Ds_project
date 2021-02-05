@@ -54,9 +54,6 @@ func start(list *LinkedList) {
 		case "?":
 			list.Display()
 			break
-		case "@":
-			printCursor()
-			break
 		case "!":
 			listString := list.getString()
 			//fmt.Println(listString)
@@ -74,20 +71,8 @@ func start(list *LinkedList) {
 		}
 	}
 }
-func printCursor() {
-	fmt.Print("cursor : ")
-	fmt.Print(cursor)
-	fmt.Print("    next : ")
-	fmt.Print(cursor.Next)
-	fmt.Print("    prev : ")
-	fmt.Print(cursor.Prev)
-}
 
-// a+b*(c^d-e)^(f+g*h)-i
-// 1+2*(3^4-5)^(6+7*8)-9
-// 1234^5-678*+^*+9-
-// 1234^5-678*+^*+9-
-// 14+2+3*5-9
+////////////////////////////////////////////////////////////////////////////////// methods to convert infix to postfix :
 func GetPre(c string) int {
 	if strings.Compare(c, "^") == 0 {
 		return 3
@@ -142,6 +127,7 @@ func InfToPost(list *LinkedList) *LinkedList {
 	return result
 }
 
+////////////////////////////////////////////////////////////////////////////////////// calculating postfix expression :
 func calculatePost(list *LinkedList) (int, error) {
 	stack := CreateStack()
 	// Scan all characters one by one
@@ -177,8 +163,8 @@ func calculatePost(list *LinkedList) (int, error) {
 	}
 	return strconv.Atoi(stack.Pop())
 }
-
-/// stack implementation :
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////// customized stack implementation :
 
 type Stack struct {
 	stack []string
@@ -223,8 +209,8 @@ func (stack *Stack) Peak() string {
 		return stack.stack[stack.top]
 	}
 }
-
-/// linked list implementation :
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////// customized  linked list implementation :
 
 type Node struct {
 	Key  string
@@ -408,7 +394,7 @@ func (list *LinkedList) Search(index int) *Node {
 	}
 }
 
-// hash table implementation :
+//////////////////////////////////////////////////////////////////////////////// customized  hash table implementation :
 
 type HashNode struct {
 	Key   string
@@ -441,17 +427,6 @@ func NewHashNode(key string, value int) *HashNode {
 	}
 }
 
-/*func hashCode(key string) int {
-	p := 31
-	m := 1000000009
-	power_of_p := 1
-	hash_val := 0
-	for i := 0; i < len(key); i++ {
-		hash_val = (hash_val + (int(key[i])-'a'+1)*power_of_p) % m
-		power_of_p = (power_of_p * p) % m
-	}
-	return hash_val
-}*/
 func (table *HashTable) hashCode(key string) int {
 	h := 0
 	o := 31415
