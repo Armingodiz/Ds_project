@@ -66,6 +66,9 @@ func start(list *LinkedList) {
 		case "?":
 			list.Display()
 			break
+		case "@":
+			table.Display()
+			break
 		case "!":
 			listString := list.getString()
 			//fmt.Println(listString)
