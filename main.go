@@ -60,10 +60,12 @@ func start(list *LinkedList) {
 			break
 		case "!":
 			listString := list.getString()
+			//fmt.Println(listString)
 			tableResult := table.Search(listString)
 			if tableResult != nil {
 				fmt.Println(tableResult.Value)
 			} else {
+				//fmt.Println("calculating ... ")
 				newList := InfToPost(list)
 				res, _ := calculatePost(newList)
 				table.Insert(listString, res)
@@ -243,7 +245,9 @@ func (list *LinkedList) getString() string {
 	result := ""
 	temp := list.Head
 	for temp != nil {
+		//fmt.Println("tsss")
 		result += temp.Key
+		temp = temp.Next
 	}
 	return result
 }
@@ -430,7 +434,8 @@ func NewHashNode(key string, value int) *HashNode {
 		Value: value,
 	}
 }
-func hashCode(key string) int {
+
+/*func hashCode(key string) int {
 	p := 31
 	m := 1000000009
 	power_of_p := 1
@@ -440,6 +445,16 @@ func hashCode(key string) int {
 		power_of_p = (power_of_p * p) % m
 	}
 	return hash_val
+}*/
+func (table *HashTable) hashCode(key string) int {
+	h := 0
+	o := 31415
+	t := 27183
+	for i := 0; i < len(key); i++ {
+		h = (o*h + int(key[i])) % table.Capacity
+		o = o * t % (table.Capacity - 1)
+	}
+	return h
 }
 
 func (table *HashTable) hashCodePrime(hashIndex int) int {
@@ -453,7 +468,7 @@ func (table *HashTable) Insert(key string, value int) error {
 		return errors.New("hash table is full !")
 	}
 	node := NewHashNode(key, value)
-	hashIndex := hashCode(key)
+	hashIndex := table.hashCode(key)
 	for table.Array[hashIndex] != nil && table.Array[hashIndex] != table.Dummy {
 		hashIndex = table.hashCodePrime(hashIndex)
 	}
@@ -467,7 +482,7 @@ func (table *HashTable) Insert(key string, value int) error {
 }
 
 func (table *HashTable) Search(key string) *HashNode {
-	hashIndex := hashCode(key)
+	hashIndex := table.hashCode(key)
 	for table.Array[hashIndex] != nil {
 		if table.Array[hashIndex].Key == key {
 			return table.Array[hashIndex]
@@ -478,7 +493,7 @@ func (table *HashTable) Search(key string) *HashNode {
 }
 
 func (table *HashTable) Delete(key string) error {
-	hashIndex := hashCode(key)
+	hashIndex := table.hashCode(key)
 	for table.Array[hashIndex] != nil {
 		if table.Array[hashIndex].Key == key {
 			table.Array[hashIndex] = table.Dummy
