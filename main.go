@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-var cursorIndex int
+var cursor *Node // pointer to the node which is before cursor
 var requests int
 var table *HashTable
 
 func main() {
-	cursorIndex = -1
+	cursor = nil
 	table = NewHashTable(10)
 	fmt.Scan(&requests)
 	var input string
@@ -33,30 +33,29 @@ func start(list *LinkedList) {
 		fmt.Scan(&inp1)
 		switch inp1 {
 		case "<":
-			if cursorIndex != -1 {
-				cursorIndex -= 1
+			if cursor != nil {
+				cursor = cursor.Prev
 			}
 			break
 		case ">":
-			if cursorIndex != list.Size {
-				cursorIndex += 1
+			if cursor == nil {
+				cursor = list.Head
+			} else if cursor != list.Tail {
+				cursor = cursor.Next
 			}
 			break
 		case "+":
 			fmt.Scan(&inp2)
 			list.AddAfterIndex(inp2)
-			if cursorIndex < list.Size {
-				cursorIndex += 1
-			}
 			break
 		case "-":
-			list.DeleteBeforIndex()
-			if cursorIndex > -1 {
-				cursorIndex -= 1
-			}
+			list.DeleteBeforeIndex()
 			break
 		case "?":
 			list.Display()
+			break
+		case "@":
+			printCursor()
 			break
 		case "!":
 			listString := list.getString()
@@ -74,6 +73,14 @@ func start(list *LinkedList) {
 			break
 		}
 	}
+}
+func printCursor() {
+	fmt.Print("cursor : ")
+	fmt.Print(cursor)
+	fmt.Print("    next : ")
+	fmt.Print(cursor.Next)
+	fmt.Print("    prev : ")
+	fmt.Print(cursor.Prev)
 }
 
 // a+b*(c^d-e)^(f+g*h)-i
@@ -276,40 +283,42 @@ func (list *LinkedList) AddFront(key string) {
 }
 
 func (list *LinkedList) AddAfterIndex(key string) {
-	if cursorIndex == -1 {
-		list.AddBack(key)
-
-	} else {
-		start := list.Search(cursorIndex)
-		node := &Node{
-			Key:  key,
-			Prev: nil,
-			Next: list.Head,
-		}
-		node.Next = start.Next
-		start.Next = node
-		node.Prev = start
+	node := &Node{
+		Key:  key,
+		Prev: cursor,
+		Next: nil,
 	}
+	if cursor == nil {
+		node.Next = list.Head
+		list.Head.Prev = node
+		list.Head = node
+	} else if cursor == list.Tail {
+		node.Next = nil
+		cursor.Next = node
+		list.Tail = node
+	} else {
+		node.Next = cursor.Next
+		cursor.Next.Prev = node
+		cursor.Next = node
+	}
+	cursor = node
 	list.Size = list.Size + 1
 }
 
-func (list *LinkedList) DeleteBeforIndex() {
-	if cursorIndex != -1 {
-		node := list.Search(cursorIndex)
-		if node.Next == nil && node.Prev == nil { // node is the only node
-			list.Head = nil
-		} else if node.Next == nil { //node is tail of list
-			list.Tail = node.Prev
-			node.Prev.Next = nil
-		} else if node.Prev == nil { //nod is head of list
-			list.Head = node.Next
-			node.Next.Prev = nil
-		} else {
-			node.Next.Prev = node.Prev
-			node.Prev.Next = node.Next
-		}
-		list.Size = list.Size - 1
+func (list *LinkedList) DeleteBeforeIndex() {
+	if cursor == list.Head {
+		cursor.Next.Prev = nil
+		list.Head = cursor.Next
+
+	} else if cursor == list.Tail {
+		cursor.Prev.Next = nil
+		list.Tail = cursor.Prev
+	} else {
+		cursor.Prev.Next = cursor.Next
+		cursor.Next.Prev = cursor.Prev
 	}
+	cursor = cursor.Prev
+	list.Size = list.Size - 1
 }
 
 func (list *LinkedList) AddBack(key string) {
@@ -369,22 +378,19 @@ func (list *LinkedList) Delete(index int) *Node {
 }
 
 func (list *LinkedList) Display() {
-	counter := 0
 	printed := false
-	if cursorIndex == -1 {
+	if cursor == nil {
 		fmt.Printf("|")
 		printed = true
 	}
 	rooter := list.Head
 	for rooter != nil {
-		//fmt.Print("@")
 		fmt.Print(rooter.Key)
-		//fmt.Print("@")
-		if counter == cursorIndex && !printed {
+		if rooter == cursor && !printed {
 			fmt.Printf("|")
+			printed = true
 		}
 		rooter = rooter.Next
-		counter += 1
 	}
 	fmt.Println()
 }
