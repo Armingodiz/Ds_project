@@ -36,7 +36,6 @@ func ScanString(inp1 *string) {
 	line = strings.TrimSuffix(line, "\n")
 	*inp1 += line
 }
-
 func Scan(inp1, inp2 *string) {
 	line, _ := reader.ReadString('\n')
 	line = strings.TrimSuffix(line, "\n")
@@ -80,7 +79,7 @@ func start(list *LinkedList) {
 			break
 		case "!":
 			listString := list.getString()
-			fmt.Println(listString)
+			//fmt.Println(listString)
 			tableResult := table.Search(listString)
 			if tableResult != nil {
 				fmt.Println(tableResult.Value)
@@ -507,3 +506,4 @@ func (table *HashTable) Display() {
 		fmt.Println("###########################################")
 	}
 }
+
