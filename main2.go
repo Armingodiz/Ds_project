@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -20,7 +21,8 @@ func main() {
 	table = NewHashTable(10)
 	fmt.Scan(&requests)
 	var input string
-	fmt.Scan(&input)
+	ScanString(&input)
+	//fmt.Println(input)
 	list := CreateLinkedList()
 	for i := 0; i < len(input); i++ {
 		list.AddFront(string(input[i]))
@@ -28,6 +30,13 @@ func main() {
 	//list.Display()
 	start(list)
 }
+func ScanString(inp1 *string) {
+	*inp1 = ""
+	line, _ := reader.ReadString('\n')
+	line = strings.TrimSuffix(line, "\n")
+	*inp1 += line
+}
+
 func Scan(inp1, inp2 *string) {
 	line, _ := reader.ReadString('\n')
 	line = strings.TrimSuffix(line, "\n")
@@ -71,7 +80,7 @@ func start(list *LinkedList) {
 			break
 		case "!":
 			listString := list.getString()
-			//fmt.Println(listString)
+			fmt.Println(listString)
 			tableResult := table.Search(listString)
 			if tableResult != nil {
 				fmt.Println(tableResult.Value)
@@ -118,6 +127,9 @@ func InfToPost(list *LinkedList) *LinkedList {
 					}
 				}
 			}
+			if len(num) >= 8 {
+				num = strconv.Itoa(mode(num, len(num)))
+			}
 			result.AddFront(num)
 		} else if strings.Compare(current.Key, "(") == 0 {
 			stack.Push(current.Key)
@@ -143,7 +155,22 @@ func InfToPost(list *LinkedList) *LinkedList {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////// calculating postfix expression :
+func mode(number string, length int) int {
+	max := math.Pow10(9) + 7
+	//fmt.Printf("before mode : %s\n", number)
+	newNum := 0
+	for i := 0; i < length; i++ {
+		digit, _ := strconv.Atoi(string(number[i]))
+		//fmt.Println(err)
+		x := float64(newNum*10 + digit)
+		newNum = int(math.Mod(x, max))
+		//fmt.Println(newNum)
+	}
+	//fmt.Printf("after mode : %d\n", newNum)
+	return newNum
+}
 func calculatePost(list *LinkedList) (int, error) {
+	list.Display()
 	stack := CreateStack()
 	// Scan all characters one by one
 	current := list.Head
@@ -151,25 +178,53 @@ func calculatePost(list *LinkedList) (int, error) {
 		// If the scanned character is an operand (number here),
 		// push it to the stack.
 		_, err := strconv.Atoi(current.Key)
-		if err == nil {
+		if err == nil || len(current.Key) >= 8 {
+			//	fmt.Printf("%s added to stack \n", current.Key)
 			stack.Push(current.Key)
 		} else { // If the scanned character is an operator, pop two
 			// elements from stack apply the operator   else
-			val1, err1 := strconv.Atoi(stack.Pop())
-			val2, err2 := strconv.Atoi(stack.Pop())
-			if err1 == nil && err2 == nil {
+			num1 := stack.Pop()
+			num2 := stack.Pop()
+			val1, err1 := strconv.Atoi(num1)
+			val2, err2 := strconv.Atoi(num2)
+			res := ""
+			if (err1 == nil || len(num1) >= 8) && (err2 == nil || len(num2) >= 8) {
+				if len(num1) >= 8 {
+					val1 = mode(num1, len(num1))
+				}
+				if len(num2) >= 8 {
+					val2 = mode(num2, len(num2))
+				}
+				// 11111111111111111111*4+6*7
+				fmt.Printf("calculating %d and %d\t\n", val1, val2)
 				switch current.Key {
 				case "+":
-					stack.Push(strconv.Itoa(val2 + val1))
+					res = strconv.Itoa(val2 + val1)
+					if len(res) >= 8 {
+						res = strconv.Itoa(mode(res, len(res)))
+					}
+					stack.Push(res)
 					break
 				case "-":
-					stack.Push(strconv.Itoa(val2 - val1))
+					res = strconv.Itoa(val2 - val1)
+					if len(res) >= 8 {
+						res = strconv.Itoa(mode(res, len(res)))
+					}
+					stack.Push(res)
 					break
 				case "*":
-					stack.Push(strconv.Itoa(val2 * val1))
+					res = strconv.Itoa(val2 * val1)
+					if len(res) >= 8 {
+						res = strconv.Itoa(mode(res, len(res)))
+					}
+					stack.Push(res)
 					break
 				case "/":
-					stack.Push(strconv.Itoa(val2 / val1))
+					res = strconv.Itoa(val2 / val1)
+					if len(res) >= 8 {
+						res = strconv.Itoa(mode(res, len(res)))
+					}
+					stack.Push(res)
 					break
 				}
 			}
